@@ -1,0 +1,4 @@
+# Request: None
+# Response: geometry_msgs/Pose
+---
+geometry_msgs/Pose obj_pose
