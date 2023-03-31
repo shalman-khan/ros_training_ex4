@@ -7,7 +7,7 @@ def generate_launch_description():
             package="usb_cam" ,
             executable="usb_cam_node_exe",
             parameters=[{
-                "video_device": "/dev/video4" , #Select Video Device based on the camera. 
+                "video_device": "/dev/video2" , #Select Video Device based on the camera. 
                 "image_width": 640,
                 "image_height": 480,
                 "framerate": 10.0,
@@ -25,7 +25,7 @@ def generate_launch_description():
             ],
             output="screen",
             emulate_tty=True,
-            respawn="false",
+            respawn=False,
             name="image_view"
         ),
     ])
