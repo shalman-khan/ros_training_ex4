@@ -7,6 +7,11 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(ros2_aruco_interfaces REQUIRED) 
