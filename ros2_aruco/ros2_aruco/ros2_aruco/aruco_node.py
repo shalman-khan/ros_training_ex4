@@ -46,12 +46,17 @@ class ArucoNode(Node):
         self.declare_parameter('camera_info_topic', '/camera_info')
         self.declare_parameter('camera_frame', None)
 
+        # Declaration of Parameter for Simulation: Default: False
+        self.declare_parameter('sim',False)
+
         self.marker_size = self.get_parameter('marker_size').get_parameter_value().double_value
         dictionary_id_name = self.get_parameter('aruco_dictionary_id').get_parameter_value().string_value
         image_topic = self.get_parameter('image_topic').get_parameter_value().string_value
         info_topic = self.get_parameter('camera_info_topic').get_parameter_value().string_value
         self.camera_frame = self.get_parameter('camera_frame').get_parameter_value().string_value
 
+        self.sim_condition = self.get_parameter('sim').value
+        
         # Dictionary ID Validation 
         try:
             dictionary_id = cv2.aruco.__getattribute__(dictionary_id_name)
@@ -114,30 +119,45 @@ class ArucoNode(Node):
 
         corners, marker_ids, rejected = cv2.aruco.detectMarkers(cv_image, self.aruco_dictionary, parameters=self.aruco_parameters)
 
+        if not self.sim_condition:
+            if marker_ids is not None:
+                if cv2.__version__ > '4.0.0':
+                    rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.intrinsic_mat, self.distortion)
+                else:
+                    rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.intrinsic_mat, self.distortion)
+                for i, marker_id in enumerate(marker_ids):
+                    self.pose.position.x = tvecs[i][0][0]
+                    self.pose.position.y = tvecs[i][0][1]
+                    self.pose.position.z = tvecs[i][0][2]
 
-        if marker_ids is not None:
-            if cv2.__version__ > '4.0.0':
-                rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.intrinsic_mat, self.distortion)
-            else:
-                rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.intrinsic_mat, self.distortion)
-            for i, marker_id in enumerate(marker_ids):
-                self.pose.position.x = tvecs[i][0][0]
-                self.pose.position.y = tvecs[i][0][1]
-                self.pose.position.z = tvecs[i][0][2]
+                    rot_matrix = np.eye(4)
+                    rot_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvecs[i][0]))[0]
 
-                rot_matrix = np.eye(4)
-                rot_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvecs[i][0]))[0]
+                    quat = transformations.quaternion_from_matrix(rot_matrix)
 
-                quat = transformations.quaternion_from_matrix(rot_matrix)
+                    self.pose.orientation.x = quat[0]
+                    self.pose.orientation.y = quat[1]
+                    self.pose.orientation.z = quat[2]
+                    self.pose.orientation.w = quat[3]
 
-                self.pose.orientation.x = quat[0]
-                self.pose.orientation.y = quat[1]
-                self.pose.orientation.z = quat[2]
-                self.pose.orientation.w = quat[3]
+                    pose_array.poses.append(self.pose)
 
-                pose_array.poses.append(self.pose)
+            self.poses_pub.publish(pose_array)
 
-        self.poses_pub.publish(pose_array)
+        else:
+            print("SIM MODE running...")
+            self.pose.position.x = 0.03
+            self.pose.position.y = 0.00
+            self.pose.position.z = 0.40
+
+            self.pose.orientation.x = -0.01
+            self.pose.orientation.y = 1.00
+            self.pose.orientation.z = -0.03
+            self.pose.orientation.w = 0.033
+            pose_array.poses.append(self.pose)
+            self.poses_pub.publish(pose_array)
+
+
 
 def main():
     rclpy.init()
