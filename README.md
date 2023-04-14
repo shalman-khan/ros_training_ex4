@@ -35,11 +35,11 @@ chmod +x moveit2_env_setup.sh
 ./moveit2_env_setup.sh
 ```
 
-Write a Service client from scratch in moveit_test_node.cpp located in moveit_exercise package [src]
-  1) Create a service client for spawn_collision_object service to spawn Aruco Marked Collision Object in RViz
-  2) Use transformPose function to determine the pose of Aruco Marked Collision Object with respect to Static Camera
-  3) Use spawnCollisionInScene function to spawn collision object in the planning scene.
-  4) Use setTargetPoseWithOffset function to set target pose based on Aruco Marked Collision Object with offset
+Write a Service client from scratch in ___moveit_test_node.cpp___ located in ___moveit_exercise package___ [src]
+  1) Create a service client for ___spawn_collision_object___ service to spawn Aruco Marked Collision Object in RViz
+  2) Use ___transformPose___ function to determine the pose of Aruco Marked Collision Object with respect to Static Camera
+  3) Use ___spawnCollisionInScene___ function to spawn collision object in the planning scene.
+  4) Use ___setTargetPoseWithOffset___ function to set target pose based on Aruco Marked Collision Object with offset
   
 ### To test the outcome:
 
