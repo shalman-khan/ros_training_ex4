@@ -54,7 +54,12 @@ Terminal 2:
 ```
 cd ~/training_ws
 source install/setup.bash
+
 ros2 run ros2_aruco aruco_node
+
+# For Simulation Mode
+ros2 run ros2_aruco aruco_node --ros-args -p sim:=true
+
 ```
 
 Terminal 3:
